@@ -1,8 +1,24 @@
+<div align="center">
+
 # MoveGate Protocol
 
-The canonical agent identity and trust layer for Sui.
+**The canonical agent identity and trust layer for Sui.**
 
-MoveGate is not an authorization tool. It is permanent infrastructure that gives every autonomous agent on Sui a verifiable on-chain identity with bounded permissions and an immutable behavior history that compounds with every action.
+Permanent infrastructure that gives every autonomous agent on Sui a verifiable
+on-chain identity with bounded permissions and an immutable behavior history.
+
+[![contracts](https://img.shields.io/badge/move-contracts-blue?style=flat-square)](https://github.com/hamzzaaamalik/movegate-contracts)
+[![sdk](https://img.shields.io/npm/v/@movegate/sdk?style=flat-square&label=sdk&color=blue)](https://www.npmjs.com/package/@movegate/sdk)
+[![license](https://img.shields.io/badge/license-MIT-green?style=flat-square)](https://github.com/hamzzaaamalik/movegate-contracts/blob/main/LICENSE)
+![tests](https://img.shields.io/badge/tests-83%20passed-brightgreen?style=flat-square)
+![coverage](https://img.shields.io/badge/coverage-96.66%25-brightgreen?style=flat-square)
+![sui](https://img.shields.io/badge/sui-1.67.2-purple?style=flat-square)
+
+[Website](https://movegate.xyz) · [Smart Contracts](https://github.com/hamzzaaamalik/movegate-contracts) · [TypeScript SDK](https://github.com/hamzzaaamalik/movegate-sdk) · [npm](https://www.npmjs.com/package/@movegate/sdk)
+
+</div>
+
+---
 
 ## Why MoveGate Exists
 
@@ -47,7 +63,7 @@ MoveGate solves this with four primitives enforced at the Move type-system level
 +----------------------------------------------------------------------+
 ```
 
-These four layers create a system where authorization cannot be bypassed, history cannot be faked, accumulated data cannot be replicated and revenue grows proportionally with ecosystem adoption.
+These four layers create a system where authorization cannot be bypassed, history cannot be faked, data cannot be replicated and revenue grows with ecosystem adoption.
 
 ## Architecture
 
@@ -155,7 +171,7 @@ public struct AuthToken {       // no abilities declaration
 
 ### Step 5: Receipt Frozen On-Chain
 
-After the action executes, an `ActionReceipt` is created and immediately frozen via `transfer::freeze_object`. It can never be modified or deleted. It records the agent, protocol, amount, success/failure, chain depth and the agent's reputation score at the time of action.
+After the action executes an `ActionReceipt` is created and immediately frozen via `transfer::freeze_object`. It can never be modified or deleted. It records the agent, protocol, amount, success/failure, chain depth and the agent's reputation score at the time of action.
 
 ```
 authorize_action  -->  protocol executes  -->  create_receipt  -->  freeze_object
@@ -531,16 +547,26 @@ All events have `copy, drop` abilities. All emitters are `public(package)` to pr
 | Immutable receipts | Frozen objects on Sui cannot be modified by anyone, including the protocol itself |
 | First-mover data | The window closes once 5 protocols integrate. Late entrants start with zero data. |
 
+## SDK
+
+The TypeScript SDK is published on npm and provides full protocol coverage: queries, transaction builders, event parsing and the `$extend` client pattern for Sui v2.
+
+```bash
+npm install @movegate/sdk @mysten/sui
+```
+
+See [@movegate/sdk on GitHub](https://github.com/hamzzaaamalik/movegate-sdk) or [npm](https://www.npmjs.com/package/@movegate/sdk).
+
 ## Roadmap
 
-| Phase | Deliverable |
-|---|---|
-| Layer 1 (complete) | Smart contracts. 6 modules. 83 tests. 96.66% coverage. |
-| Layer 2 | TypeScript SDK (`@movegate/sdk`). Passport queries. Mandate creation. |
-| Layer 3 | Three frontend portals: Protocol Partner Dashboard, Agent Developer Console, End User Mandate Manager |
-| Security Audit | MoveBit audit submission. Full vulnerability checklist pre-verified. |
-| Mainnet | Production deployment with AdminCap in multisig. |
+| Phase | Status | Deliverable |
+|---|---|---|
+| Layer 1 | Complete | Smart contracts. 6 modules. 83 tests. 96.66% coverage. |
+| Layer 2 | Complete | TypeScript SDK ([`@movegate/sdk`](https://github.com/hamzzaaamalik/movegate-sdk)). Queries, tx builders, 37 tests. |
+| Layer 3 | Next | Three frontend portals: Protocol Partner Dashboard, Agent Developer Console, End User Mandate Manager |
+| Security Audit | Planned | MoveBit audit submission. Full vulnerability checklist pre-verified. |
+| Mainnet | Planned | Production deployment with AdminCap in multisig. |
 
 ## License
 
-MIT. MoveGate is trust infrastructure. Open source is not a tradeoff. It is the correct decision for infrastructure that protocols must trust with their risk management.
+MIT
