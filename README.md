@@ -2,10 +2,10 @@
 
 # MoveGate Protocol
 
-**The canonical agent identity and trust layer for Sui.**
+**Safely onboard autonomous agents into your Sui protocol.**
 
-Permanent infrastructure that gives every autonomous agent on Sui a verifiable
-on-chain identity with bounded permissions and an immutable behavior history.
+Bounded permissions, on-chain reputation and immutable audit trails.
+No private key sharing. One function call to integrate.
 
 [![contracts](https://img.shields.io/badge/move-contracts-blue?style=flat-square)](https://github.com/hamzzaaamalik/movegate-contracts)
 [![sdk](https://img.shields.io/npm/v/@movegate/sdk?style=flat-square&label=sdk&color=blue)](https://www.npmjs.com/package/@movegate/sdk)
