@@ -370,6 +370,36 @@ fun test_score_below_min_actions() {
 }
 
 #[test]
+/// EC-G13: register_agent public entry point creates passport for sender
+fun test_register_agent() {
+    let mut scenario = ts::begin(AGENT1);
+    setup(&mut scenario);
+    let clock = clock::create_for_testing(ts::ctx(&mut scenario));
+
+    // AGENT1 calls register_agent
+    ts::next_tx(&mut scenario, AGENT1);
+    {
+        let mut registry = ts::take_shared<AgentRegistry>(&scenario);
+        assert!(!passport::has_passport(&registry, AGENT1), 0);
+        passport::register_agent(&mut registry, &clock, ts::ctx(&mut scenario));
+        assert!(passport::has_passport(&registry, AGENT1), 1);
+        ts::return_shared(registry);
+    };
+
+    // Calling again is idempotent
+    ts::next_tx(&mut scenario, AGENT1);
+    {
+        let mut registry = ts::take_shared<AgentRegistry>(&scenario);
+        passport::register_agent(&mut registry, &clock, ts::ctx(&mut scenario));
+        assert!(passport::registry_total_registered(&registry) == 1, 2);
+        ts::return_shared(registry);
+    };
+
+    clock::destroy_for_testing(clock);
+    ts::end(scenario);
+}
+
+#[test]
 #[expected_failure(abort_code = movegate::passport::EPassportNotFound)]
 /// EC-G11: get_passport_id for non-existent agent aborts
 fun test_passport_not_found() {

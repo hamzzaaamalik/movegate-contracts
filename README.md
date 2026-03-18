@@ -80,7 +80,7 @@ treasury      passport            (depend on errors, events)
       mandate                     (depends on errors, events, treasury, passport)
          |
          v
-      receipt                     (depends on errors, events, mandate, passport)
+      receipt                     (depends on events, mandate, passport)
 ```
 
 **Critical design decision:** `passport.move` has no dependency on `mandate.move`. The identity layer is independent of the authorization layer. Agents can have a passport before any mandate exists. Protocols can query passport data without integrating mandate authorization. The identity layer can be upgraded independently.
@@ -92,8 +92,10 @@ treasury      passport            (depend on errors, events)
 The first time an agent interacts with MoveGate, an `AgentPassport` is created automatically. No registration. No fee. No friction. The passport is a shared object that persists permanently on-chain.
 
 ```
-ensure_passport(registry, agent_address, clock)
+register_agent(registry, clock, ctx)
 ```
+
+`register_agent` is the public entry point. It calls `ensure_passport` internally (which is `public(package)` to prevent external spoofing). Idempotent. Safe to call multiple times.
 
 Every subsequent action updates the passport: total volume, success rate, unique protocols, consecutive streaks. This data feeds the reputation score.
 
@@ -364,18 +366,21 @@ Min Score:    None (new agents welcome)
 
 ```
 Network:    Sui Testnet
-Package ID: <deployed after publish>
+Package ID: 0xec91e604714e263ad43723d43470f236607bd0b13f64731aad36b00a61cf884a
+Tx Digest:  AWJUKXSDEVvUrSBmSDhrncnRyBwsShQcQR6UJi16Ge5Q
+Deployer:   0xaca7964ff16c481ae3c2f43580accd730574d87badc5557719af58abe50b47e3
 ```
 
 Objects created on publish:
 
-| Object | Type | Purpose |
+| Object | ID | Type |
 |---|---|---|
-| `AgentRegistry` | Shared | Maps agent addresses to passport object IDs |
-| `MandateRegistry` | Shared | Maps mandate IDs to owners |
-| `FeeConfig` | Shared | Fee parameters (creation fee, auth fee BPS) |
-| `ProtocolTreasury` | Shared | Accumulates collected fees |
-| `AdminCap` | Transferred to deployer | Required for fee changes and treasury withdrawal |
+| `AgentRegistry` | `0xb2fadc7ccf9c7b578ba3b1adb8ebfd73191563e536b6b2cc18aa14dac6c7ba46` | Shared |
+| `MandateRegistry` | `0x26a66d91fef324b833d07d134e5ab6e796e0dfd77f670c27da099479d939b0d3` | Shared |
+| `FeeConfig` | `0x5c92c420f4b3801eb4126fcab6cb4b98212b31f591b4b3d0a025b4e4957120f3` | Shared |
+| `ProtocolTreasury` | `0xf0714bd816e595cacfc9e5921d1754cca0205f6b65867eab6183d0b0a98fc82c` | Shared |
+| `AdminCap` | `0x37464b867d7d5fa77380ca0ba6ce30bb38680dff0cc69373363a173c10533dd6` | Owned by deployer |
+| `UpgradeCap` | `0xda32476b5cb8819c803da3088106d216739f4c1b4629411e0a069ffc180640bd` | Owned by deployer |
 
 ## Project Structure
 
@@ -415,7 +420,7 @@ sui move test --coverage
 sui move coverage summary --test
 ```
 
-**82 tests** across 7 test modules. **96.66% line coverage.** Zero warnings. Zero TODO/FIXME/HACK in production code.
+**83 tests** across 7 test modules. **96.66% line coverage.** Zero warnings. Zero TODO/FIXME/HACK in production code.
 
 Test categories cover all 55+ edge cases from the specification:
 
@@ -483,6 +488,7 @@ Test categories cover all 55+ edge cases from the specification:
 | `AGE_THRESHOLD_DAYS` | 180 | 6 months for max age score |
 | `STREAK_THRESHOLD` | 100 | 100 consecutive successes for max streak |
 | `DIVERSITY_THRESHOLD` | 5 | 5 unique protocols for max diversity |
+| `MAX_TOP_PROTOCOLS` | 10 | Maximum protocols tracked in passport history |
 
 ## Error Codes
 
@@ -529,7 +535,7 @@ All events have `copy, drop` abilities. All emitters are `public(package)` to pr
 
 | Phase | Deliverable |
 |---|---|
-| Layer 1 (complete) | Smart contracts. 6 modules. 82 tests. 96.66% coverage. |
+| Layer 1 (complete) | Smart contracts. 6 modules. 83 tests. 96.66% coverage. |
 | Layer 2 | TypeScript SDK (`@movegate/sdk`). Passport queries. Mandate creation. |
 | Layer 3 | Three frontend portals: Protocol Partner Dashboard, Agent Developer Console, End User Mandate Manager |
 | Security Audit | MoveBit audit submission. Full vulnerability checklist pre-verified. |

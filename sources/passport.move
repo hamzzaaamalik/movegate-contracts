@@ -334,6 +334,20 @@ public fun set_verification_tier(
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// Public Entry Points — callable by external users and protocols
+// ═══════════════════════════════════════════════════════════════════
+
+/// Register the transaction sender as an agent. Creates a passport if one does not exist.
+/// Free. Idempotent. Safe to call multiple times.
+public fun register_agent(
+    registry: &mut AgentRegistry,
+    clock: &Clock,
+    ctx: &mut TxContext,
+) {
+    ensure_passport(registry, ctx.sender(), clock, ctx);
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // Public Read Accessors — callable by any protocol
 // ═══════════════════════════════════════════════════════════════════
 
